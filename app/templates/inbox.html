@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Live Inbox - SpamGuard{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 900px;">
+    <h1>Your Live Inbox</h1>
+    <p style="text-align: center; margin-bottom: 20px;">Fetching the latest 10 emails from your connected account...</p>
+
+    {% if error %}
+        <div class="alert alert-danger" style="background: var(--danger-bg); color: var(--danger-text); padding: 15px; border-radius: 8px;">
+            {{ error }}
+        </div>
+    {% endif %}
+
+    <div class="inbox-list" style="margin-top: 20px;">
+        {% for mail in emails %}
+        <div class="inbox-item" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 20px; border-radius: 12px; margin-bottom: 15px;">
+            <div style="display: flex; justify-content: space-between; align-items: start;">
+                <h3 style="margin: 0 0 10px 0; color: var(--btn-bg);">{{ mail.subject }}</h3>
+                <span style="font-size: 13px; color: gray;">{{ mail.date }}</span>
+            </div>
+            <p style="margin: 0; font-size: 14px; color: var(--text-color); line-height: 1.5;">
+                {{ mail.body[:200] }}...
+            </p>
+            <div style="margin-top: 15px;">
+                <form action="/predict" method="post">
+                    <input type="hidden" name="email" value="{{ mail.body }}">
+                    <button type="submit" class="auth-btn" style="padding: 8px 20px; font-size: 14px; width: auto; background: var(--nav-bg);">
+                        <i class="fa-solid fa-magnifying-glass"></i> Check Spam
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% else %}
+            {% if not error %}
+            <p style="text-align: center;">No emails found.</p>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

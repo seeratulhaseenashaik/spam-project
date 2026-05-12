@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Register - SpamGuard{% endblock %}
+{% block content %}
+<div class="auth-container">
+    <div class="auth-box">
+        <h1>Register</h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}" style="color:var(--danger-text); margin-bottom: 10px;">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        <form action="/register" method="POST">
+            <div class="form-group">
+                <input type="text" name="username" placeholder="Website Username" required>
+            </div>
+            <div class="form-group">
+                <input type="password" name="password" placeholder="Website Password" required>
+            </div>
+            <div class="form-group">
+                <input type="email" name="app_email" placeholder="Gmail Address (e.g. you@gmail.com)" required>
+            </div>
+            <div class="form-group">
+                <input type="password" name="app_password" placeholder="Gmail App Password" required>
+            </div>
+            <p style="font-size: 11px; text-align: left; color: gray; margin-bottom: 15px;">
+                Note: An App Password is a 16-digit passcode generated in your Google Account security settings.
+            </p>
+            <button type="submit" class="auth-btn">Sign Up</button>
+        </form>
+        <p style="margin-top:20px;">Already have an account? <a href="/login" style="color: var(--nav-hover);">Login here</a></p>
+    </div>
+</div>
+{% endblock %}

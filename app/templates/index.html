@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard - SpamGuard{% endblock %}
+{% block content %}
+<div class="container">
+    <h1>Email Check Dashboard</h1>
+    
+    <div class="mini-dashboard">
+        <div class="stat-box">
+            <h3>Total Checked</h3>
+            <p>{{ stats.total }}</p>
+        </div>
+        <div class="stat-box">
+            <h3>Spam Emails</h3>
+            <p>{{ stats.spam }}</p>
+        </div>
+        <div class="stat-box">
+            <h3>Ham Emails</h3>
+            <p>{{ stats.ham }}</p>
+        </div>
+        <div class="stat-box">
+            <h3>Spam Rate</h3>
+            <p>{{ stats.rate }}%</p>
+        </div>
+    </div>
+
+    <form action="/predict" method="post">
+        <textarea name="email" placeholder="Paste your email content here to scan..." required>{% if email_text %}{{ email_text }}{% endif %}</textarea>
+        <button type="submit" class="check-btn"><i class="fa-solid fa-magnifying-glass"></i> Analyze Email</button>
+    </form>
+    
+    {% if prediction %}
+    <div class="result-card {% if is_spam %}spam{% elif is_priority %}priority{% else %}ham{% endif %}">
+        <h2>
+            {% if is_spam %}
+               <i class="fa-solid fa-triangle-exclamation"></i> SPAM EMAIL
+            {% elif is_priority %}
+               <i class="fa-solid fa-bolt"></i> PRIORITY ACTION REQUIRED
+            {% else %}
+               <i class="fa-solid fa-circle-check"></i> NOT SPAM
+            {% endif %}
+        </h2>
+        <p><strong>Spam Probability Score:</strong> {{ score }}%</p>
+        <p><strong>Reason:</strong></p>
+        <ul class="reason-list">
+        {% for reason in reasons %}
+            <li>{{ reason }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

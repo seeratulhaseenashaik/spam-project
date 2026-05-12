@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}History - SpamGuard{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 1000px;">
+    <h1>Your Scanning History</h1>
+    
+    <input type="text" id="searchInput" placeholder="Search by content or result..." 
+           style="width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 15px;">
+           
+    <table class="data-table" id="historyTable">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Content Preview</th>
+                <th>Result</th>
+                <th>Score</th>
+                <th>Reasons</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+            <tr>
+                <td style="white-space: nowrap;">{{ log.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ log.body }}">{{ log.body }}</td>
+                <td>
+                    {% if log.prediction == 'Spam' %}
+                        <span style="color: var(--danger-text); font-weight: 600;">Spam</span>
+                    {% else %}
+                        <span style="color: var(--success-text); font-weight: 600;">Ham</span>
+                    {% endif %}
+                </td>
+                <td>{{ log.probability }}%</td>
+                <td style="font-size: 13px;">
+                    <ul style="margin:0; padding-left:15px;">
+                        {% for reason in json.loads(log.reasons) %}
+                            <li>{{ reason }}</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        let filter = this.value.toLowerCase();
+        let rows = document.getElementById('historyTable').getElementsByTagName('tr');
+        
+        for (let i = 1; i < rows.length; i++) {
+            let text = rows[i].textContent.toLowerCase();
+            if (text.indexOf(filter) > -1) {
+                rows[i].style.display = '';
+            } else {
+                rows[i].style.display = 'none';
+            }
+        }
+    });
+</script>
+{% endblock %}

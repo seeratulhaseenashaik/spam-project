@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}Trends - SpamGuard{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 800px; text-align: center;">
+    <h1>Scanning Trends</h1>
+    <p style="margin-bottom: 30px;">Overview of your email scanning activity</p>
+
+    <div style="background: var(--bg-color); padding: 20px; border-radius: 12px; margin-bottom: 30px; max-width: 400px; margin-left: auto; margin-right: auto;">
+        <canvas id="trendsChart"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('trendsChart').getContext('2d');
+    
+    // Injecting stats directly via jinja or falling to 0
+    let spamCount = parseInt('{{ stats.spam | default(0) }}', 10);
+    let hamCount = parseInt('{{ stats.ham | default(0) }}', 10);
+    
+    // Custom colors defining our theme
+    let spamColor = '#D62828';
+    let hamColor = '#4E8D9C';
+    let labelColor = document.documentElement.getAttribute('data-theme') === 'dark' ? '#ffffff' : '#003049';
+
+    if (document.documentElement.getAttribute('data-theme') === 'dark') {
+        Chart.defaults.color = '#ffffff';
+    } else {
+        Chart.defaults.color = '#003049';
+    }
+
+    const trendsChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Spam Detected', 'Safe (Ham)'],
+            datasets: [{
+                data: [spamCount, hamCount],
+                backgroundColor: [spamColor, hamColor],
+                borderWidth: 0,
+                hoverOffset: 10
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { font: { family: 'Poppins', size: 14 } }
+                }
+            }
+        }
+    });
+
+    // Re-render chart text color when theme toggles
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+        setTimeout(() => {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            Chart.defaults.color = isDark ? '#ffffff' : '#003049';
+            trendsChart.update();
+        }, 100);
+    });
+</script>
+{% endblock %}

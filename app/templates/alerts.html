@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Email Alerts - SpamGuard{% endblock %}
+{% block content %}
+<div class="container">
+    <h1 style="text-align: center; color: var(--text-color); margin-bottom: 30px;">
+        <i class="fa-solid fa-bell" style="color: var(--btn-bg);"></i> Recent Notifications
+    </h1>
+    
+    <div id="alerts-list"></div>
+</div>
+
+<script>
+async function loadAlerts() {
+    try {
+        const res = await fetch("/alerts");
+        const data = await res.json();
+        const box = document.getElementById("alerts-list");
+        box.innerHTML = "";
+        
+        if (data.alerts.length === 0) {
+            box.innerHTML = `
+                <div style="text-align: center; padding: 30px; opacity: 0.6;">
+                    <i class="fa-solid fa-inbox" style="font-size: 40px; margin-bottom: 10px;"></i>
+                    <p>No recent notifications found.</p>
+                </div>
+            `;
+            return;
+        }
+
+        data.alerts.reverse().forEach(a => {
+            box.innerHTML += `
+            <div class="result-card ${ a.type === 'spam' ? 'spam' : 'ham' }" style="margin-top: 15px; position: relative;">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <h2 style="font-size: 18px; margin-bottom: 8px; flex: 1; margin-right: 15px; word-break: break-word;">
+                        ${ a.type === 'spam' ? '<i class="fa-solid fa-triangle-exclamation"></i> SPAM: ' : '<i class="fa-solid fa-envelope"></i> ' } 
+                        ${a.subject}
+                    </h2>
+                    <a href="https://mail.google.com/mail/u/0/#search/subject%3A${encodeURIComponent(a.subject.replace(/"/g, ''))}" target="_blank" class="auth-btn" style="padding: 6px 15px; font-size: 14px; width: auto; background: var(--nav-bg); text-decoration: none; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px;">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Mail
+                    </a>
+                </div>
+                <p style="margin: 0; font-size: 15px; opacity: 0.9;">${a.body}</p>
+            </div>
+            `;
+        });
+    } catch (e) {
+        console.error("Error loading alerts:", e);
+    }
+}
+
+setInterval(loadAlerts, 5000);
+loadAlerts();
+</script>
+{% endblock %}
