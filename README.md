@@ -1,6 +1,6 @@
 # Spam Detection Project
 
-This project is an AI-based spam detection system built using Python and Flask.
+This project is a spam detection system built using Python and Flask.
 
 ## Features
 - Spam message classification
